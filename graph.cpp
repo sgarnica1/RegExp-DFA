@@ -34,6 +34,16 @@ int Graph::size()
   return this->nodes.size();
 }
 
+/**
+ * @brief
+ * Gets the adjacency list of the graph
+ * @return std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> Adjacency list of the graph
+ */
+std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> Graph::getAdjList()
+{
+  return this->adjList;
+}
+
 // Manipulation methods
 /**
  * @brief
@@ -69,6 +79,24 @@ void Graph::addEdge(std::string origin, std::string destiny, std::string weight)
 {
   this->adjList[origin].push_back(std::make_pair(destiny, weight));
   this->edges.insert(weight);
+}
+
+/**
+ * @brief
+ * Modifies an edge in the graph
+ * @param origin Origin of the edge
+ * @param destiny Destiny of the edge
+ * @param weight Weight of the edge
+ * @return void
+ */
+void Graph::modifyDestiny(std::string origin, std::string destiny, std::string weight, std::string newDestiny)
+{
+  for (auto &i : adjList[origin])
+    if (i.first == destiny && i.second == weight)
+    {
+      i.first = newDestiny;
+      break;
+    }
 }
 
 /**

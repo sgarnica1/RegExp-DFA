@@ -41,6 +41,9 @@ void Automata::readExpression(std::string expression)
     if (char_ == "+")
       oneOrMore();
 
+    if (char_ == "*")
+      zeroOrMore();
+
     // if (std::regex_match(std::string(1, character), std::regex("\\)")))
     // {
     //   std::cout << "Get elements from stacks" << std::endl;
@@ -235,4 +238,48 @@ void Automata::concat(std::string character)
 void Automata::oneOrMore()
 {
   this->graph.addEdge(this->graph.getTail(), getTempHeadNode(), "ε");
+}
+
+/**
+ * @brief
+ * Zero or more. Allows a character to be repeated or not
+ * @return void
+ */
+
+void Automata::zeroOrMore()
+{
+  oneOrMore();
+
+  // Create 2 new nodes
+  int origin = this->graph.createNode();
+  int destiny = this->graph.createNode();
+
+  // Verify if a node is already connected to the temp head
+  bool found = false;
+  for (auto &i : graph.getAdjList())
+  {
+    for (auto &j : i.second)
+    {
+      if (std::stoi(i.first) == std::stoi(getTempHeadNode()))
+        found = true;
+
+      if (getTempHeadNode() == j.first && found)
+        graph.modifyDestiny(i.first, j.first, j.second, std::to_string(origin));
+    }
+  }
+
+  // Connect origin to temp head through epsilon
+  this->graph.addEdge(std::to_string(origin), getTempHeadNode(), "ε");
+
+  // Connect current tail to destiny through epsilon
+  this->graph.addEdge(this->graph.getTail(), std::to_string(destiny), "ε");
+
+  // Connect origin to destiny through epsilon
+  this->graph.addEdge(std::to_string(origin), std::to_string(destiny), "ε");
+
+  // Set origin as temp head
+  setTempHeadNode(std::to_string(origin));
+
+  // Set destiny as tail
+  this->graph.setTail(std::to_string(destiny));
 }

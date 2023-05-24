@@ -30,6 +30,7 @@ public:
   std::string getHead();
   std::string getTail();
   int size();
+  std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> getAdjList();
 
   // Setters
   void setHead(std::string head);
@@ -38,6 +39,7 @@ public:
   // Methods
   int createNode();
   void addEdge(std::string origin, std::string destiny, std::string weight);
+  void modifyDestiny(std::string origin, std::string destiny, std::string weight, std::string newDestiny);
 
   // Print methods
   void printAdjList();
