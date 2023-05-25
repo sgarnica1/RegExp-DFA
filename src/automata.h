@@ -25,10 +25,10 @@ public:
   void readExpression(std::string expression);
 
 private:
-  std::stack<std::string> operatorStack;
-  std::stack<std::string> expressionStack;
   Graph graph;
   std::string tempHeadNode;
+  std::stack<std::string> operatorStack;
+  std::stack<std::string> expressionStack;
 
   // Methods
   void addOperator(std::string operator_);
@@ -40,18 +40,21 @@ private:
 
   // Getters
   std::string getLastOperator();
-  std::string getLastExpression();
   std::string getTempHeadNode();
 
   // Setters
   void setTempHeadNode(std::string tempHeadNode);
 
+  // Modifier methods
+  void popOperator();
+  void popExpression();
+
   // Operator Helpers
-  void setFirstNode(std::string character);
+  void setFirstEdge(std::string character);
   void concat(std::string character);
   void oneOrMore();
   void zeroOrMore();
-  void or_();
+  void or_(std::string weight);
 };
 
 #endif // AUTOMATA_H

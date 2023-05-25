@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
   // Temporary logic
   Automata automata;
-  automata.readExpression("aa*");
+  automata.readExpression("a|b");
 
   return 0;
 }
