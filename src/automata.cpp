@@ -6,7 +6,7 @@
 #include "graph.cpp"
 
 // Regular expressions
-std::string operators = "[\\+\\|\\*\\(\\)]";
+std::string operators = "[\\+\\|\\*]";
 std::string expressions = "[a-zA-Z0-9]";
 
 // Regex patterns
@@ -21,9 +21,12 @@ std::regex exprPattern(expressions);
  * @param expression expression to be read
  * @return void
  */
+
 void Automata::readExpression(std::string expression)
 {
-  std::cout << "Expression: " << expression << "\n\n";
+  // std::cout << "Expression: " << expression << "\n\n";
+
+  this->prev = "";
 
   for (char character : expression)
   {
@@ -31,14 +34,19 @@ void Automata::readExpression(std::string expression)
 
     if (char_ == "+")
       oneOrMore();
-
     if (char_ == "*")
       zeroOrMore();
-
+      
     if (getLastOperator() == "|")
     {
-      or_(char_);
-      break;
+      int Node1 = graph.createNode();
+      int Node2 = graph.createNode();
+
+      // Create new connection between Node1 and Node2 through weight
+      this->graph.addEdge(std::to_string(Node1), std::to_string(Node2), char_);
+
+      or_(std::to_string(Node1), std::to_string(Node2));
+      continue;
     }
 
     // Check if the character is an expression
@@ -54,9 +62,14 @@ void Automata::readExpression(std::string expression)
     {
       this->addOperator(char_);
     }
+
+    this->prev = char_;
   }
 
   graph.printAdjList();
+  std::cout << "\n";
+  printPositionStack();
+  std::cout << "\n";
 }
 
 // Access methods
@@ -84,6 +97,28 @@ std::string Automata::getTempHeadNode()
   return this->tempHeadNode;
 }
 
+/**
+ * @brief
+ * Gets the last position of the stack
+ * @return std::pair<std::string, std::string> Last position of the stack
+ */
+std::string Automata::getLastPosition()
+{
+  if (this->positionStack.empty())
+    return "";
+  return this->positionStack.top();
+}
+
+/**
+ * @brief
+ * Gets the previous value
+ * @return std::string Previous value
+ */
+std::string Automata::getPrev()
+{
+  return this->prev;
+}
+
 // Setters
 
 /**
@@ -96,6 +131,18 @@ std::string Automata::getTempHeadNode()
 void Automata::setTempHeadNode(std::string tempHeadNode)
 {
   this->tempHeadNode = tempHeadNode;
+}
+
+/**
+ * @brief
+ * Set previous value
+ * @param prev Previous value
+ * @return void
+ */
+
+void Automata::setPrev(std::string prev)
+{
+  this->prev = prev;
 }
 
 // Manipulation methods
@@ -117,6 +164,27 @@ void Automata::popOperator()
 void Automata::popExpression()
 {
   this->expressionStack.pop();
+}
+
+/**
+ * @brief
+ * Gets the last position of the stack
+ * @return std::string Last position of the stack
+ */
+void Automata::popPosition()
+{
+  this->positionStack.pop();
+}
+
+/**
+ * @brief
+ * Adds an expression to the stack
+ * @param expression expression to be added
+ * @return void
+ */
+void Automata::addPosition(std::string position)
+{
+  this->positionStack.push(position);
 }
 
 /**
@@ -183,6 +251,26 @@ void Automata::printExpressionStack()
   }
 }
 
+/**
+ * @brief
+ * Prints the position stack
+ * @return void
+ */
+
+void Automata::printPositionStack()
+{
+  std::stack<std::string> tempStack;
+  tempStack = this->positionStack;
+
+  std::cout << "Position stack: ";
+
+  while (!tempStack.empty())
+  {
+    std::cout << tempStack.top() << " ";
+    tempStack.pop();
+  }
+}
+
 // Operator helpers
 
 /**
@@ -207,8 +295,8 @@ void Automata::setFirstEdge(std::string character)
   // Connect node 1 to node 2 through character
   this->graph.addEdge(std::to_string(Node1), std::to_string(Node2), character);
 
-  // Add character to expression stack
-  this->addExpression(character);
+  if (this->prev == "(")
+    addPosition(std::to_string(Node1));
 }
 
 /**
@@ -229,8 +317,8 @@ void Automata::concat(std::string character)
   // Set new node as tail
   this->graph.setTail(std::to_string(Node));
 
-  // Add character to expression stack
-  this->addExpression(character);
+  if (this->prev == "(")
+    addPosition(getTempHeadNode());
 }
 
 /**
@@ -297,16 +385,14 @@ void Automata::zeroOrMore()
  * @return void
  */
 
-void Automata::or_(std::string weight)
+void Automata::or_(std::string node1, std::string node2)
 {
   // Pop operator
   popOperator();
 
   // Create 4 new nodes
-  int Node1, Node2, origin, destiny;
+  int origin, destiny;
 
-  Node1 = this->graph.createNode();
-  Node2 = this->graph.createNode();
   origin = this->graph.createNode();
   destiny = this->graph.createNode();
 
@@ -314,20 +400,17 @@ void Automata::or_(std::string weight)
   if (getTempHeadNode() == this->graph.getHead())
     this->graph.setHead(std::to_string(origin));
 
-  // Create new connection between Node1 and Node2 through weight
-  this->graph.addEdge(std::to_string(Node1), std::to_string(Node2), weight);
-
   // Create new connection between origin and temp head through epsilon
   this->graph.addEdge(std::to_string(origin), getTempHeadNode(), "ε");
 
   // Create new connection between origin and Node1 through epsilon
-  this->graph.addEdge(std::to_string(origin), std::to_string(Node1), "ε");
+  this->graph.addEdge(std::to_string(origin), node1, "ε");
 
   // Create new connection between tail and destiny through epsilon
   this->graph.addEdge(this->graph.getTail(), std::to_string(destiny), "ε");
 
   // Create new connection between Node2 and destiny through epsilon
-  this->graph.addEdge(std::to_string(Node2), std::to_string(destiny), "ε");
+  this->graph.addEdge(node2, std::to_string(destiny), "ε");
 
   // Set origin2 as temp head
   setTempHeadNode(std::to_string(origin));

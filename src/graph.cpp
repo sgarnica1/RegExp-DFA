@@ -106,11 +106,11 @@ void Graph::modifyDestiny(std::string origin, std::string destiny, std::string w
  */
 int Graph::createNode()
 {
-  int node = utils::random(0, 1000);
+  int node = utils::random(0, 50);
 
   // Check if the node already exists
   while (this->nodes.find(node) != this->nodes.end())
-    node = utils::random(0, 1000);
+    node = utils::random(0, 50);
 
   // Add the node to the set
   this->nodes.insert(node);
@@ -128,7 +128,8 @@ void Graph::printAdjList()
   std::vector<std::string> lines;
   std::string aux;
 
-  std::cout << "Adjacency list:" << std::endl;
+  std::cout << "\nAdjacency list:\n"
+            << std::endl;
 
   for (auto &i : this->adjList)
   {
@@ -151,5 +152,5 @@ void Graph::printAdjList()
   utils::printVector(lines);
 
   // Print the tail
-  std::cout << "[Tail] " << this->tail << std::endl;
+  std::cout << "\n[Tail] " << this->tail << std::endl;
 }
