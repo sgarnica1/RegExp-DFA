@@ -23,7 +23,7 @@ std::regex exprPattern(expressions);
  */
 void Automata::readExpression(std::string expression)
 {
-  std::cout << "Expression: " << expression << std::endl;
+  std::cout << "Expression: " << expression << "\n\n";
 
   for (char character : expression)
   {
@@ -55,13 +55,6 @@ void Automata::readExpression(std::string expression)
       this->addOperator(char_);
     }
   }
-
-  // std::cout << "OpStack size: " << operatorStack.size() << std::endl;
-  // std::cout << "ExpStack size: " << expressionStack.size() << std::endl;
-
-  // std::cout << "Last operator: " << getLastOperator() << std::endl;
-  // popOperator();
-  // std::cout << "OpStack size: " << operatorStack.size() << std::endl;
 
   graph.printAdjList();
 }
@@ -278,6 +271,10 @@ void Automata::zeroOrMore()
     }
   }
 
+  // Set origin as head
+  if (getTempHeadNode() == graph.getHead())
+    graph.setHead(std::to_string(origin));
+
   // Connect origin to temp head through epsilon
   this->graph.addEdge(std::to_string(origin), getTempHeadNode(), "ε");
 
@@ -302,10 +299,8 @@ void Automata::zeroOrMore()
 
 void Automata::or_(std::string weight)
 {
+  // Pop operator
   popOperator();
-
-  // std::cout << getTempHeadNode() << std::endl;
-  // std::cout << this->graph.getTail() << std::endl;
 
   // Create 4 new nodes
   int Node1, Node2, origin, destiny;
@@ -314,6 +309,10 @@ void Automata::or_(std::string weight)
   Node2 = this->graph.createNode();
   origin = this->graph.createNode();
   destiny = this->graph.createNode();
+
+  // Set origin as head
+  if (getTempHeadNode() == this->graph.getHead())
+    this->graph.setHead(std::to_string(origin));
 
   // Create new connection between Node1 and Node2 through weight
   this->graph.addEdge(std::to_string(Node1), std::to_string(Node2), weight);

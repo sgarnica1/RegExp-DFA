@@ -128,9 +128,14 @@ void Graph::printAdjList()
   std::vector<std::string> lines;
   std::string aux;
 
+  std::cout << "Adjacency list:" << std::endl;
+
   for (auto &i : this->adjList)
   {
-    aux += i.first + " -> ";
+    if (i.first == this->head)
+      aux += "[Head] " + i.first + " -> ";
+    else
+      aux += "       " + i.first + " -> ";
 
     for (auto &j : i.second)
       aux += "(" + j.first + ", " + j.second + ") ";
@@ -144,4 +149,7 @@ void Graph::printAdjList()
 
   // Print the vector
   utils::printVector(lines);
+
+  // Print the tail
+  std::cout << "[Tail] " << this->tail << std::endl;
 }
