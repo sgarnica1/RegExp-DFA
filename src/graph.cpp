@@ -1,12 +1,55 @@
-#include "graph.h"
 #include "utils.h"
+#include "graph.h"
+#include <algorithm>
 
-// Access methods
+// Constructor
 
 /**
  * @brief
- * Gets the head of the graph
- * @return std::string Head of the graph
+ * Graph class
+ * @class Graph
+ * @param weight
+ * The weight of the graph
+ * @details
+ * This class is in charge of keeping the graph data structure.
+ */
+
+Graph::Graph(std::string weight)
+{
+  this->head = createNode();
+  this->tail = createNode();
+  this->addEdge(this->head, this->tail, weight);
+}
+
+/**
+ * @brief
+ * Graph class
+ * @class Graph
+ * @param head
+ * The head of the graph
+ * @param tail
+ * The tail of the graph
+ * @param weight
+ * The weight of the graph
+ * @details
+ * This class is in charge of keeping the graph data structure.
+ */
+
+Graph::Graph(std::string head, std::string tail, std::string weight)
+{
+  this->head = head;
+  this->tail = tail;
+  this->addNode(head);
+  this->addNode(tail);
+  this->addEdge(head, tail, weight);
+}
+
+// Getters
+/**
+ * @brief
+ * Get the head of the graph
+ * @return std::string
+ * The head of the graph
  */
 std::string Graph::getHead()
 {
@@ -15,42 +58,23 @@ std::string Graph::getHead()
 
 /**
  * @brief
- * Gets the tail of the graph
- * @return std::string Tail of the graph
+ * Get the tail of the graph
+ * @return std::string
+ * The tail of the graph
  */
 std::string Graph::getTail()
 {
   return this->tail;
 }
 
+// Setters
 /**
  * @brief
- * Gets the size of the nodes
- * @return int Size of the nodes
+ * Set the head of the graph
+ * @param head
+ * The head of the graph
  */
 
-int Graph::size()
-{
-  return this->nodes.size();
-}
-
-/**
- * @brief
- * Gets the adjacency list of the graph
- * @return std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> Adjacency list of the graph
- */
-std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> Graph::getAdjList()
-{
-  return this->adjList;
-}
-
-// Manipulation methods
-/**
- * @brief
- * Sets the head of the graph
- * @param head Head of the graph
- * @return void
- */
 void Graph::setHead(std::string head)
 {
   this->head = head;
@@ -58,72 +82,21 @@ void Graph::setHead(std::string head)
 
 /**
  * @brief
- * Sets the tail of the graph
- * @param tail Tail of the graph
- * @return void
+ * Set the tail of the graph
+ * @param tail
+ * The tail of the graph
  */
 void Graph::setTail(std::string tail)
 {
   this->tail = tail;
 }
 
+// Printers
 /**
  * @brief
- * Adds an edge to the graph
- * @param origin Origin of the edge
- * @param destiny Destiny of the edge
- * @param weight Weight of the edge
- * @return void
+ * Print the adjacency list of the graph
  */
-void Graph::addEdge(std::string origin, std::string destiny, std::string weight)
-{
-  this->adjList[origin].push_back(std::make_pair(destiny, weight));
-  this->edges.insert(weight);
-}
-
-/**
- * @brief
- * Modifies an edge in the graph
- * @param origin Origin of the edge
- * @param destiny Destiny of the edge
- * @param weight Weight of the edge
- * @return void
- */
-void Graph::modifyDestiny(std::string origin, std::string destiny, std::string weight, std::string newDestiny)
-{
-  for (auto &i : adjList[origin])
-    if (i.first == destiny && i.second == weight)
-    {
-      i.first = newDestiny;
-      break;
-    }
-}
-
-/**
- * @brief
- * Creates a node in the graph
- * @return void
- */
-int Graph::createNode()
-{
-  int node = utils::random(0, 50);
-
-  // Check if the node already exists
-  while (this->nodes.find(node) != this->nodes.end())
-    node = utils::random(0, 50);
-
-  // Add the node to the set
-  this->nodes.insert(node);
-  return node;
-}
-
-// Print methods
-/**
- * @brief
- * Prints the adjacency list of the graph
- * @return void
- */
-void Graph::printAdjList()
+void Graph::print()
 {
   std::vector<std::string> lines;
   std::string aux;
@@ -148,9 +121,154 @@ void Graph::printAdjList()
     aux = "";
   }
 
-  // Print the vector
   utils::printVector(lines);
 
   // Print the tail
   std::cout << "\n[Tail] " << this->tail << std::endl;
+}
+
+// Graph methods
+/**
+ * @brief
+ * Add a node to the graph
+ * @param node
+ * The node to be added
+ */
+void Graph::addNode(std::string node)
+{
+  this->nodes.insert(node);
+}
+
+/**
+ * @brief
+ * Create a node
+ * @return std::string
+ * The node created
+ */
+std::string Graph::createNode()
+{
+  int node = 0;
+
+  if (nodes.size() > 0)
+    node = std::stoi(*std::max_element(nodes.begin(), nodes.end())) + 1;
+
+  // Add the node to the set
+  addNode(std::to_string(node));
+  return std::to_string(node);
+}
+
+/**
+ * @brief
+ * Add a node to the graph as the head and tail
+ * @return void
+ * @details
+ * This method is used to extend the graph, by adding a new head and tail.
+ */
+
+void Graph::addLimitNodes()
+{
+  std::string newHead = createNode();
+  std::string newTail = createNode();
+
+  // Add the new head and tail
+  addEdge(newHead, this->head, "ε");
+  addEdge(this->tail, newTail, "ε");
+
+  // Update the head and tail
+  this->head = newHead;
+  this->tail = newTail;
+}
+
+/**
+ * @brief
+ * Add an edge to the graph
+ * @param origin
+ * The origin of the edge
+ * @param destination
+ * The destination of the edge
+ * @param weight
+ * The weight of the edge
+ */
+void Graph::addEdge(std::string origin, std::string destination, std::string weight)
+{
+  this->adjList[origin].push_back(std::make_pair(destination, weight));
+
+  if (head == "")
+    this->head = origin;
+
+  if (origin == this->tail)
+    this->tail = destination;
+}
+
+/**
+ * @brief
+ * Join two graphs
+ * @param automata
+ * The graph to be joined
+ */
+void Graph::join(Graph automata)
+{
+  std::vector<std::vector<std::string>> lines;
+
+  int size = nodes.size();
+  std::string newHead = std::to_string(size + std::stoi(automata.getHead())); // current size + head of the automata
+  this->addEdge(this->tail, newHead, "ε");
+
+  // Add the edges
+  for (auto &i : automata.adjList)
+    for (auto &j : i.second)
+    {
+      int node1 = size + std::stoi(i.first);
+      int node2 = size + std::stoi(j.first);
+
+      // Add nodes
+      this->addNode(std::to_string(node1));
+      this->addNode(std::to_string(node2));
+
+      lines.push_back({std::to_string(node1), std::to_string(node2), j.second});
+    }
+
+  // Add the edges to the graph in reverse order
+  for (int i = lines.size() - 1; i >= 0; i--)
+    this->addEdge(lines[i][0], lines[i][1], lines[i][2]);
+
+  // Update the tail
+  this->tail = std::to_string(size + std::stoi(automata.tail));
+}
+
+/**
+ * @brief
+ * Add a graph to the current graph without joining them
+ * @param automata
+ * The graph to be concatenated
+ */
+
+std::pair<int, int> Graph::addGraph(Graph automata)
+{
+  std::vector<std::vector<std::string>> lines;
+
+  int size = nodes.size();
+
+  // Add the edges
+  for (auto &i : automata.adjList)
+    for (auto &j : i.second)
+    {
+      int node1 = size + std::stoi(i.first);
+      int node2 = size + std::stoi(j.first);
+
+      // Add nodes
+      this->addNode(std::to_string(node1));
+      this->addNode(std::to_string(node2));
+
+      lines.push_back({std::to_string(node1), std::to_string(node2), j.second});
+    }
+
+  // Add the edges to the graph in reverse order
+  for (int i = lines.size() - 1; i >= 0; i--)
+    this->addEdge(lines[i][0], lines[i][1], lines[i][2]);
+
+  // Update the tail
+  this->tail = std::to_string(size + std::stoi(automata.tail));
+
+  return std::make_pair(size, size + std::stoi(automata.tail));
 }

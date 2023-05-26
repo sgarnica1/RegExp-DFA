@@ -22,6 +22,8 @@ class Graph
 public:
   // Constructor
   Graph() = default;
+  Graph(std::string weight);
+  Graph(std::string head, std::string tail, std::string weight);
 
   // Destructor
   ~Graph() = default;
@@ -29,29 +31,27 @@ public:
   // Getters
   std::string getHead();
   std::string getTail();
-  int size();
-  std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> getAdjList();
 
   // Setters
   void setHead(std::string head);
   void setTail(std::string tail);
 
-  // Methods
-  int createNode();
-  void addEdge(std::string origin, std::string destiny, std::string weight);
-  void modifyDestiny(std::string origin, std::string destiny, std::string weight, std::string newDestiny);
+  // Printers
+  void print();
 
-  // Print methods
-  void printAdjList();
+  // Graph methods
+  std::string createNode();
+  void addNode(std::string node);
+  void addLimitNodes();
+  void addEdge(std::string origin, std::string destination, std::string weight);
+  void join(Graph automata);
+  std::pair<int, int> addGraph(Graph automata);
 
 private:
   std::string head;
   std::string tail;
+  std::set<std::string> nodes;
   std::unordered_map<std::string, std::vector<std::pair<std::string, std::string>>> adjList;
-  std::set<int> nodes;
-  std::set<std::string> edges;
-
-  // Methods
 };
 
 #endif // GRAPH_H
