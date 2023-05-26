@@ -23,6 +23,7 @@ public:
 
   // Automata methods
   void readExpression(std::string expression);
+  std::string mapExpression(std::string expression);
 
 private:
   std::stack<Graph> automatas;

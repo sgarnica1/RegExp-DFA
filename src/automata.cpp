@@ -13,6 +13,7 @@ std::regex operatorsPattern(OPERATORS);
 std::regex operandsPattern(OPERANDS);
 
 // Automata methods
+
 /**
  * @brief
  * Read the expression
@@ -21,7 +22,7 @@ std::regex operandsPattern(OPERANDS);
  */
 void Automata::readExpression(std::string expression)
 {
-  std::cout << "Expression: " << expression << std::endl;
+  expression = mapExpression(expression);
 
   for (char char_ : expression)
   {
@@ -42,6 +43,13 @@ void Automata::readExpression(std::string expression)
       if (operators.size() == 0)
       {
         pushOperator(character);
+
+        if (character == "*" || character == "+")
+        {
+          std::string lastOp = getOperator();
+          popOperator();
+          applyOperator(lastOp);
+        }
         continue;
       }
 
@@ -75,11 +83,43 @@ void Automata::readExpression(std::string expression)
     applyOperator(lastOp);
   }
 
-  std::cout << "\nAutomata: ";
+  std::cout << "\n--- NDFA --- ";
   printAutomatas();
-  std::cout << "\nOperators: ";
-  printOperators();
-  std::cout << std::endl;
+}
+
+/**
+ * @brief
+ * Modify the expression to add the concatenation operator
+ * @param expression
+ * The expression to modify
+ * @return std::string
+ */
+
+std::string Automata::mapExpression(std::string expression)
+{
+  std::string mappedExpression = "";
+
+  for (int i = 0; i < expression.length(); i++)
+  {
+    std::string character(1, expression[i]);
+
+    if (i + 1 < expression.length())
+    {
+      std::string nextCharacter(1, expression[i + 1]);
+
+      mappedExpression += character;
+
+      if (std::regex_match(character, operandsPattern) && (std::regex_match(nextCharacter, operandsPattern) || nextCharacter == "("))
+        mappedExpression += CONCAT_OP;
+
+      if (character == "*" || character == "+")
+        mappedExpression += CONCAT_OP;
+    }
+  }
+
+  mappedExpression += expression[expression.length() - 1];
+
+  return mappedExpression;
 }
 
 // Private methods
@@ -171,18 +211,14 @@ void Automata::applyOperator(std::string op)
 
   if (op == "*")
     automata = zeroOrMore(popAutomata());
-
-  if (op == "+")
+  else if (op == "+")
     automata = oneOrMore(popAutomata());
-
-  if (op == CONCAT_OP)
+  else if (op == CONCAT_OP)
     automata = concat(popAutomata(), popAutomata());
-
-  if (op == "|")
+  else if (op == "|")
     automata = orOperator(popAutomata(), popAutomata());
-
-  if (op == "(" | op == ")")
-    std::cout << "Apply parenthesis";
+  else
+    return;
 
   pushAutomata(automata);
 }
@@ -303,7 +339,6 @@ Graph Automata::zeroOrMore(Graph automata)
 {
   automata = oneOrMore(automata);
   automata.addEdge(automata.getHead(), automata.getTail(), "ε");
-  automata.print();
   return automata;
 }
 
