@@ -51,6 +51,10 @@ private:
 
   // Operators
   Graph concat(Graph automata1, Graph automata2);
+  Graph oneOrMore(Graph automata);
+  Graph zeroOrMore(Graph automata);
+
+
 };
 
 #endif // AUTOMATA_H

@@ -42,6 +42,7 @@ public:
   // Graph methods
   std::string createNode();
   void addNode(std::string node);
+  void addLimitNodes();
   void addEdge(std::string origin, std::string destination, std::string weight);
   void join(Graph automata);
 

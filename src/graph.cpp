@@ -159,6 +159,28 @@ std::string Graph::createNode()
 
 /**
  * @brief
+ * Add a node to the graph as the head and tail
+ * @return void
+ * @details
+ * This method is used to extend the graph, by adding a new head and tail.
+ */
+
+void Graph::addLimitNodes()
+{
+  std::string newHead = createNode();
+  std::string newTail = createNode();
+
+  // Add the new head and tail
+  addEdge(newHead, this->head, "ε");
+  addEdge(this->tail, newTail, "ε");
+
+  // Update the head and tail
+  this->head = newHead;
+  this->tail = newTail;
+}
+
+/**
+ * @brief
  * Add an edge to the graph
  * @param origin
  * The origin of the edge
@@ -189,7 +211,8 @@ void Graph::join(Graph automata)
   std::vector<std::vector<std::string>> lines;
 
   int size = nodes.size();
-  this->addEdge(this->tail, std::to_string(size), "ε");
+  std::string newHead = std::to_string(size + std::stoi(automata.getHead())); // current size + head of the automata
+  this->addEdge(this->tail, newHead, "ε");
 
   // Add the edges
   for (auto &i : automata.adjList)

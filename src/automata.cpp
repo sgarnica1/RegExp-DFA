@@ -167,20 +167,24 @@ std::string Automata::getOperator()
  */
 void Automata::applyOperator(std::string op)
 {
+  Graph automata;
+
   if (op == "*")
-    std::cout << "Apply zero or more\n";
+    automata = zeroOrMore(popAutomata());
 
   if (op == "+")
-    std::cout << "Apply one or more\n";
+    automata = oneOrMore(popAutomata());
 
   if (op == CONCAT_OP)
-    concat(popAutomata(), popAutomata());
+    automata = concat(popAutomata(), popAutomata());
 
   if (op == "|")
     std::cout << "Apply or\n";
 
   if (op == "(" | op == ")")
     std::cout << "Apply parenthesis";
+
+  pushAutomata(automata);
 }
 
 /**
@@ -264,6 +268,41 @@ void Automata::printOperators()
 Graph Automata::concat(Graph graph1, Graph graph2)
 {
   graph1.join(graph2);
-  this->pushAutomata(graph1);
   return graph1;
+}
+
+/**
+ * @brief
+ * Apply the one or more operator
+ * @param automata
+ * The automata to apply the operator
+ * @return Graph
+ * The automata with the operator applied
+ */
+
+Graph Automata::oneOrMore(Graph automata)
+{
+  std::string head = automata.getHead();
+  std::string tail = automata.getTail();
+
+  automata.addLimitNodes();
+  automata.addEdge(tail, head, "ε");
+  return automata;
+}
+
+/**
+ * @brief
+ * Apply the zero or more operator
+ * @param automata
+ * The automata to apply the operator
+ * @return Graph
+ * The automata with the operator applied
+ */
+
+Graph Automata::zeroOrMore(Graph automata)
+{
+  automata = oneOrMore(automata);
+  automata.addEdge(automata.getHead(), automata.getTail(), "ε");
+  automata.print();
+  return automata;
 }
