@@ -45,6 +45,7 @@ public:
   void addLimitNodes();
   void addEdge(std::string origin, std::string destination, std::string weight);
   void join(Graph automata);
+  std::pair<int, int> addGraph(Graph automata);
 
 private:
   std::string head;

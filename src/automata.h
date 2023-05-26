@@ -50,9 +50,10 @@ private:
   void printOperators();
 
   // Operators
-  Graph concat(Graph automata1, Graph automata2);
   Graph oneOrMore(Graph automata);
   Graph zeroOrMore(Graph automata);
+  Graph concat(Graph automata1, Graph automata2);
+  Graph orOperator(Graph automata1, Graph automata2);
 
 
 };

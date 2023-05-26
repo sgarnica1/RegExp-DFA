@@ -235,3 +235,40 @@ void Graph::join(Graph automata)
   // Update the tail
   this->tail = std::to_string(size + std::stoi(automata.tail));
 }
+
+/**
+ * @brief
+ * Add a graph to the current graph without joining them
+ * @param automata
+ * The graph to be concatenated
+ */
+
+std::pair<int, int> Graph::addGraph(Graph automata)
+{
+  std::vector<std::vector<std::string>> lines;
+
+  int size = nodes.size();
+
+  // Add the edges
+  for (auto &i : automata.adjList)
+    for (auto &j : i.second)
+    {
+      int node1 = size + std::stoi(i.first);
+      int node2 = size + std::stoi(j.first);
+
+      // Add nodes
+      this->addNode(std::to_string(node1));
+      this->addNode(std::to_string(node2));
+
+      lines.push_back({std::to_string(node1), std::to_string(node2), j.second});
+    }
+
+  // Add the edges to the graph in reverse order
+  for (int i = lines.size() - 1; i >= 0; i--)
+    this->addEdge(lines[i][0], lines[i][1], lines[i][2]);
+
+  // Update the tail
+  this->tail = std::to_string(size + std::stoi(automata.tail));
+
+  return std::make_pair(size, size + std::stoi(automata.tail));
+}

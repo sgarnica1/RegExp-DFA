@@ -179,7 +179,7 @@ void Automata::applyOperator(std::string op)
     automata = concat(popAutomata(), popAutomata());
 
   if (op == "|")
-    std::cout << "Apply or\n";
+    automata = orOperator(popAutomata(), popAutomata());
 
   if (op == "(" | op == ")")
     std::cout << "Apply parenthesis";
@@ -305,4 +305,36 @@ Graph Automata::zeroOrMore(Graph automata)
   automata.addEdge(automata.getHead(), automata.getTail(), "ε");
   automata.print();
   return automata;
+}
+
+/**
+ * @brief
+ * Apply the or operator
+ * @param automata1
+ * The first automata
+ * @param automata2
+ * The second automata
+ * @return Graph
+ * The automata with the operator applied
+ */
+
+Graph Automata::orOperator(Graph automata1, Graph automata2)
+{
+  // Get the tail of the automata 1
+  std::string tail = automata1.getTail();
+
+  // Copy automata 2 in automata 1 and get the limits
+  std::pair<int, int> limits = automata1.addGraph(automata2);
+
+  // Get the head of the automata 2
+  std::string head = std::to_string(limits.first);
+
+  // Add the new head and tail to the automata 1
+  automata1.addLimitNodes();
+
+  // Add the new edges
+  automata1.addEdge(automata1.getHead(), head, "ε");
+  automata1.addEdge(tail, automata1.getTail(), "ε");
+
+  return automata1;
 }
